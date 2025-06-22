@@ -2,27 +2,30 @@ from aiogram import Bot, Dispatcher, types, executor
 from aiogram.types import ParseMode
 from fastapi import FastAPI, Request
 import uvicorn
-import asyncio
+import os
+import threading
 
-API_TOKEN = "7292839933:AAGpBvKyDZGdFotJDwVKelwXmjk6HQN_Ui4"
-CHANNEL_ID = "-1002769883348"
+API_TOKEN = os.getenv("API_TOKEN")
+CHANNEL_ID = os.getenv("CHANNEL_ID")
 
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
 app = FastAPI()
 
+
 @dp.message_handler(commands=['start'])
 async def send_welcome(message: types.Message):
-    await message.reply("👋 Привет! Я бот Alpha Enters. Готов к работе.")
+    await message.reply("👋 Привет! Бот Alpha Enters работает.\nИспользуй /signal чтобы отправить сигнал в канал.")
 
 @dp.message_handler(commands=['signal'])
 async def handle_signal(message: types.Message):
     text = message.get_args()
     if not text:
-        await message.reply("⚠️ Используй так: /signal ваш_текст_сигнала")
+        await message.reply("⚠️ Пример: /signal Вход LONG по BTC с TP и SL")
         return
     await bot.send_message(CHANNEL_ID, text, parse_mode=ParseMode.MARKDOWN)
     await message.reply("✅ Сигнал отправлен в канал")
+
 
 @app.post("/webhook")
 async def webhook_tv(request: Request):
@@ -33,11 +36,10 @@ async def webhook_tv(request: Request):
         return {"status": "sent"}
     return {"status": "no_message"}
 
+
+def start():
+    uvicorn.run(app, host="0.0.0.0", port=8000)
+
 if __name__ == '__main__':
-    import threading
-
-    def run_fastapi():
-        uvicorn.run(app, host="0.0.0.0", port=8000)
-
-    threading.Thread(target=run_fastapi).start()
+    threading.Thread(target=start).start()
     executor.start_polling(dp, skip_updates=True)
