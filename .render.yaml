@@ -1,0 +1,13 @@
+# Exported from Render on 2025-06-23T20:04:34Z
+services:
+- type: web
+  name: alpha-enters-bot
+  runtime: python
+  pythonVersion: 3.10.13
+  repo: https://github.com/ldostupl/alpha-enters-bot
+  plan: free
+  region: oregon
+  buildCommand: pip install -r requirements.txt
+  startCommand: python main.py
+  autoDeployTrigger: commit
+version: "1"
