@@ -2,7 +2,7 @@ version: "1"
 
 services:
   - type: web
-    name: alpha-enters-bot
+    name: alpha-enters-bot-py310
     runtime: python
     repo: https://github.com/ldostupl/alpha-enters-bot
     plan: free
