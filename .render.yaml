@@ -2,10 +2,10 @@ services:
 - type: web
   name: alpha-enters-bot
   runtime: python
-  pythonVersion: 3.10.13
   repo: https://github.com/ldostupl/alpha-enters-bot
   plan: free
   region: oregon
+  pythonVersion: 3.10.13
   buildCommand: pip install -r requirements.txt
   startCommand: python main.py
   autoDeployTrigger: commit
