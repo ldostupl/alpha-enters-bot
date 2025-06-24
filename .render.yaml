@@ -1,6 +1,5 @@
 version: "1"
 
-
 services:
   - type: web
     name: alpha-enters-bot
