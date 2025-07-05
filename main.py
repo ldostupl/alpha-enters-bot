@@ -34,13 +34,9 @@ async def webhook_tv(request: Request):
     data = await request.json()
     msg = data.get("message")
     if msg:
-        try:
-            asyncio.create_task(bot.send_message(CHANNEL_ID, msg, parse_mode=ParseMode.MARKDOWN))
-            return {"status": "sent"}
-        except Exception as e:
-            return {"status": "error", "details": str(e)}
+        asyncio.create_task(bot.send_message(CHANNEL_ID, msg, parse_mode=ParseMode.MARKDOWN))
+        return {"status": "sent"}
     return {"status": "no_message"}
-
 
 
 def start():
