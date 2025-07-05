@@ -1,11 +1,9 @@
+version: "1"
 services:
   - type: web
     name: alpha-enters-bot
-    env: python
     repo: https://github.com/ldostupl/alpha-enters-bot
     plan: free
     region: oregon
-    buildCommand: pip install -r requirements.txt
-    startCommand: python main.py
+    dockerfilePath: Dockerfile
     autoDeploy: true
-    pythonVersion: 3.10.13
