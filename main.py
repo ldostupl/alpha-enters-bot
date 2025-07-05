@@ -4,6 +4,8 @@ from fastapi import FastAPI, Request
 import uvicorn
 import os
 import threading
+import asyncio
+import json
 
 API_TOKEN = os.getenv("API_TOKEN")
 CHANNEL_ID = os.getenv("CHANNEL_ID")
@@ -32,9 +34,13 @@ async def webhook_tv(request: Request):
     data = await request.json()
     msg = data.get("message")
     if msg:
-        await bot.send_message(CHANNEL_ID, msg, parse_mode=ParseMode.MARKDOWN)
-        return {"status": "sent"}
+        try:
+            asyncio.create_task(bot.send_message(CHANNEL_ID, msg, parse_mode=ParseMode.MARKDOWN))
+            return {"status": "sent"}
+        except Exception as e:
+            return {"status": "error", "details": str(e)}
     return {"status": "no_message"}
+
 
 
 def start():
