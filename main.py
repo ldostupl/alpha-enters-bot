@@ -21,13 +21,26 @@ async def send_welcome(message: types.Message):
     await message.reply("👋 Привет! Бот Alpha Enters работает.\nИспользуй /signal чтобы отправить сигнал в канал.")
 
 
-@dp.message_handler(commands=["signal"])
+@dp.message_handler(commands=['signal'])
 async def handle_signal(message: types.Message):
-    text = message.get_args()
-    if not text:
-        await message.reply("⚠️ Пример: /signal Вход LONG по BTC с TP и SL")
+    args = message.get_args()
+    if not args:
+        await message.reply("⚠️ Пример: /signal LONG BTC 61200 62800 60400")
         return
-    await bot.send_message(CHANNEL_ID, text, parse_mode=ParseMode.MARKDOWN)
+
+    try:
+        position, pair, entry, target, stop = args.split()
+        formatted = (
+            f"🚀 [{position.upper()}] {pair.upper()} от {entry}\n"
+            f"🎯 Цель: {target}\n"
+            f"🛑 Стоп: {stop}\n"
+            f"📊 Риск/прибыль: ?\n"
+            f"📅 Время: {message.date.strftime('%d.%m.%Y %H:%M')}"
+        )
+    except ValueError:
+        formatted = args  # если не по шаблону — шлём как есть
+
+    await bot.send_message(CHANNEL_ID, formatted, parse_mode=ParseMode.MARKDOWN)
     await message.reply("✅ Сигнал отправлен в канал")
 
 
