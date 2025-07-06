@@ -23,25 +23,58 @@ async def send_welcome(message: types.Message):
 
 @dp.message_handler(commands=['signal'])
 async def handle_signal(message: types.Message):
-    args = message.get_args()
-    if not args:
-        await message.reply("⚠️ Пример: /signal LONG BTC 61200 62800 60400")
-        return
+    args = message.get_args().lower().split()
 
     try:
-        position, pair, entry, target, stop = args.split()
-        formatted = (
-            f"🚀 [{position.upper()}] {pair.upper()} от {entry}\n"
-            f"🎯 Цель: {target}\n"
-            f"🛑 Стоп: {stop}\n"
-            f"📊 Риск/прибыль: ?\n"
-            f"📅 Время: {message.date.strftime('%d.%m.%Y %H:%M')}"
-        )
-    except ValueError:
-        formatted = args  # если не по шаблону — шлём как есть
+        direction = args[0].upper()
+        asset = args[1].upper()
 
-    await bot.send_message(CHANNEL_ID, formatted, parse_mode=ParseMode.MARKDOWN)
-    await message.reply("✅ Сигнал отправлен в канал")
+        entry = None
+        sl = None
+        tps = []
+
+        i = 2
+        while i < len(args):
+            if args[i] == "entry":
+                entry = args[i + 1]
+                i += 2
+            elif args[i] == "tp":
+                i += 1
+                while i < len(args) and args[i].replace('.', '', 1).isdigit():
+                    tps.append(args[i])
+                    i += 1
+            elif args[i].startswith("sl"):
+                sl = args[i].replace("sl", "")
+                if not sl:
+                    sl = args[i + 1]
+                    i += 2
+                else:
+                    i += 1
+            else:
+                i += 1
+
+        if not all([direction, asset, entry, sl, tps]):
+            raise ValueError("⚠️ Не хватает обязательных параметров")
+
+        # 🧾 Формируем текст
+        msg = f"""📢 *Новый сигнал от Alpha Enters*:
+
+🔸 Вход: {direction}
+💰 Актив: {asset}
+📥 Entry: {entry}"""
+
+        for idx, tp in enumerate(tps, 1):
+            msg += f"\n🎯 TP{idx}: {tp}"
+
+        msg += f"\n🛡️ SL: {sl}"
+
+        await bot.send_message(CHANNEL_ID, msg, parse_mode=ParseMode.MARKDOWN)
+        await message.reply("✅ Сигнал отправлен в канал")
+
+    except Exception as e:
+        print(e)
+        await message.reply("❌ Ошибка: убедитесь в правильности команды. Пример:\n/signal long btc entry 61200 tp 61800 62300 62900 sl 60400")
+
 
 
 @app.post("/webhook")
