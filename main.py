@@ -26,18 +26,17 @@ async def send_welcome(message: types.Message):
 async def handle_signal(message: types.Message):
     text = message.get_args()
     if not text:
-        await message.reply("⚠️ Пример: /signal long btc entry 61200 tp 62300 sl 60400")
+        await message.reply("⚠️ Пример: /signal long btc entry 61200 tp 61800 62300 62900 sl 60400")
         return
 
     try:
         parts = text.lower().split()
-        direction = parts[0].upper()
-        asset = parts[1].upper()
-        entry = next((p for i, p in enumerate(parts) if p == "entry"), None)
+        direction = parts[0].upper()         # long
+        asset = parts[1].upper()             # btc
+        entry_price = parts[parts.index("entry") + 1]
         tp_index = parts.index("tp")
         sl_index = parts.index("sl")
-        entry_price = parts[parts.index("entry") + 1] if entry else "—"
-        tps = parts[tp_index + 1:sl_index]
+        tps = parts[tp_index + 1:sl_index]   # [61800, 62300, 62900]
         sl_price = parts[sl_index + 1]
 
         tp_text = " / ".join(tps)
@@ -51,8 +50,10 @@ async def handle_signal(message: types.Message):
         )
         await bot.send_message(CHANNEL_ID, formatted, parse_mode=ParseMode.MARKDOWN)
         await message.reply("✅ Сигнал отправлен в канал")
+
     except Exception as e:
         await message.reply(f"❌ Ошибка обработки сигнала: {e}")
+
 
 
 @app.post("/webhook")
